@@ -9,10 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class BuildModeCommand extends Command {
 
@@ -21,7 +18,7 @@ public class BuildModeCommand extends Command {
     public BuildModeCommand(LuckyLobbyProtect plugin) {
         super("buildmode");
         this.plugin = plugin;
-        this.setAliases(Collections.singletonList("build"));
+        this.setAliases(Arrays.asList("build", "bm"));
         this.registerCommand(this);
     }
 
@@ -46,17 +43,17 @@ public class BuildModeCommand extends Command {
 
         Player player = (Player) sender;
         if (!sender.hasPermission("lucky.buildmode")) {
-            sender.sendMessage("§e§lLUCKYCORE §a/ §cYou don't have permission to toggle build mode!");
+            sender.sendMessage("§e§lBUILDMODE §a/ §cYou don't have permission to toggle build mode!");
             return false;
         }
 
         if (args.length == 0) {
             if (plugin.getBuildModeList().contains(player)) {
                 plugin.getBuildModeList().remove(player);
-                sender.sendMessage("§e§lLUCKYCORE §a/ §dBuild mode §cdisabled§d!");
+                sender.sendMessage("§e§lBUILDMODE §a/ §eBuild mode §cdisabled§e.");
             } else {
                 plugin.getBuildModeList().add(player);
-                sender.sendMessage("§e§lLUCKYCORE §a/ §dBuild mode §aenabled§d!");
+                sender.sendMessage("§e§lBUILDMODE §a/ §eBuild mode §aenabled§e.");
             }
             return false;
         }
@@ -71,53 +68,57 @@ public class BuildModeCommand extends Command {
                 plugin.reloadConfig();
                 plugin.getListenerManager().reload();
 
-                sender.sendMessage("§e§lLUCKYCORE §a/ §aConfig reloaded!");
+                sender.sendMessage("§e§lBUILDMODE §a/ §eConfig reloaded!");
             } else if (args[0].equalsIgnoreCase("help")) {
                 sender.sendMessage("§cUsage: /buildmode");
                 sender.sendMessage("§cUsage: /buildmode reload");
+                sender.sendMessage("§cUsage: /buildmode listEvents");
+                sender.sendMessage("§cUsage: /buildmode check <player>");
                 sender.sendMessage("§cUsage: /buildmode whitelist <player> <event>");
                 sender.sendMessage("§cUsage: /buildmode unwhitelist <player> <event>");
                 sender.sendMessage("§cUsage: /buildmode unwhitelist <player>");
+            } else if (args[0].equalsIgnoreCase("listEvents")) {
+                sender.sendMessage("§e§lBUILDMODE §a/ §eList of active events: §d" + Joiner.on(", ").join(plugin.getListenerManager().getActiveListeners()));
             } else {
-                Player target = Bukkit.getPlayer(args[1]);
+                Player target = Bukkit.getPlayer(args[0]);
                 if (target == null) {
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §cPlayer not found!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §cPlayer not found!");
                     return;
                 }
 
                 if (plugin.getBuildModeList().contains(target)) {
                     plugin.getBuildModeList().remove(target);
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §dBuild mode §cdisabled §dfor §6" + target.getName() + "§d!");
-                    target.sendMessage("§e§lLUCKYCORE §a/ §dBuild mode §cdisabled§d!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §eBuild mode §cdisabled §efor §d" + target.getName() + "§e.");
+                    target.sendMessage("§e§lBUILDMODE §a/ §eBuild mode §cdisabled§d!");
                 } else {
                     plugin.getBuildModeList().add(target);
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §aBuild mode §aenabled §dfor §6" + target.getName() + "§d!");
-                    target.sendMessage("§e§lLUCKYCORE §a/ §aBuild mode §aenabled!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §eBuild mode §aenabled §efor §d" + target.getName() + "§e.");
+                    target.sendMessage("§e§lBUILDMODE §a/ §eBuild mode §aenabled!");
                 }
             }
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("unwhitelist")) {
                 Player target = Bukkit.getPlayer(args[1]);
                 if (target == null) {
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §cPlayer not found!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §cPlayer not found!");
                     return;
                 }
 
                 if (!plugin.getListenerManager().getWhitelistedMap().containsKey(target)) {
                     if (plugin.getBuildModeList().contains(target)) {
-                        sender.sendMessage("§e§lLUCKYCORE §a/ §aTarget using build mode!");
+                        sender.sendMessage("§e§lBUILDMODE §a/ §cTarget is already using build mode!");
                     } else {
-                        sender.sendMessage("§e§lLUCKYCORE §a/ §cTarget is not bypassing anything!");
+                        sender.sendMessage("§e§lBUILDMODE §a/ §cTarget is not bypassing anything!");
                     }
                     return;
                 }
 
                 plugin.getListenerManager().getWhitelistedMap().remove(target);
-                sender.sendMessage("§e§lLUCKYCORE §a/ §dSuccessfully §cunwhitelisted §6" + target.getName() + "§d!");
+                sender.sendMessage("§e§lBUILDMODE §a/ §eSuccessfully §cunwhitelisted §d" + target.getName() + "§e.");
             } else if (args[0].equalsIgnoreCase("check")) {
                 Player target = Bukkit.getPlayer(args[1]);
                 if (target == null) {
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §cPlayer not found!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §cPlayer not found!");
                     return;
                 }
 
@@ -126,17 +127,19 @@ public class BuildModeCommand extends Command {
                     List<String> whitelists = new ArrayList<>(whitelistedMap.get(target));
                     Collections.sort(whitelists);
 
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §6" + target.getName() + " §dis §6" + Joiner.on(",").join(whitelists) + "§d!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §d" + target.getName() + " §eis bypassing §6" + Joiner.on(",").join(whitelists) + "§e.");
                 } else {
                     if (plugin.getBuildModeList().contains(target)) {
-                        sender.sendMessage("§e§lLUCKYCORE §a/ §aTarget using build mode!");
+                        sender.sendMessage("§e§lBUILDMODE §a/ §cTarget is already using build mode!");
                     } else {
-                        sender.sendMessage("§e§lLUCKYCORE §a/ §cTarget is not bypassing anything!");
+                        sender.sendMessage("§e§lBUILDMODE §a/ §cTarget is not bypassing anything!");
                     }
                 }
             } else {
                 sender.sendMessage("§cUsage: /buildmode");
                 sender.sendMessage("§cUsage: /buildmode reload");
+                sender.sendMessage("§cUsage: /buildmode listEvents");
+                sender.sendMessage("§cUsage: /buildmode check <player>");
                 sender.sendMessage("§cUsage: /buildmode whitelist <player> <event>");
                 sender.sendMessage("§cUsage: /buildmode unwhitelist <player> <event>");
                 sender.sendMessage("§cUsage: /buildmode unwhitelist <player>");
@@ -145,7 +148,7 @@ public class BuildModeCommand extends Command {
             if (args[0].equalsIgnoreCase("whitelist")) {
                 Player target = Bukkit.getPlayer(args[1]);
                 if (target == null) {
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §cPlayer not found!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §cPlayer not found!");
                     return;
                 }
 
@@ -153,7 +156,7 @@ public class BuildModeCommand extends Command {
                 if (whitelistedMap.containsKey(target)) {
                     List<String> whitelists = new ArrayList<>(whitelistedMap.get(target));
                     if (whitelists.contains(args[2].toLowerCase())) {
-                        sender.sendMessage("§e§lLUCKYCORE §a/ §c" + target.getName() + " §cis already bypassing" + args[2].toLowerCase() + "§c!");
+                        sender.sendMessage("§e§lBUILDMODE §a/ §c§l" + target.getName() + " §cis already bypassing §l" + args[2].toLowerCase() + "§c!");
                         return;
                     }
                     whitelists.add(args[2].toLowerCase());
@@ -163,11 +166,11 @@ public class BuildModeCommand extends Command {
                     whitelistedMap.put(target, Collections.singletonList(args[2].toLowerCase()));
                 }
 
-                sender.sendMessage("§e§lLUCKYCORE §a/ §6" + target.getName() + " §dis §anow bypassing §6" + args[2].toLowerCase() + "§d!");
+                sender.sendMessage("§e§lBUILDMODE §a/ §d" + target.getName() + " §eis now bypassing §6" + args[2].toLowerCase() + "§e.");
             } else if (args[0].equalsIgnoreCase("unwhitelist")) {
                 Player target = Bukkit.getPlayer(args[1]);
                 if (target == null) {
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §cPlayer not found!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §cPlayer not found!");
                     return;
                 }
 
@@ -175,23 +178,24 @@ public class BuildModeCommand extends Command {
                 if (whitelistedMap.containsKey(target)) {
                     List<String> whitelists = new ArrayList<>(whitelistedMap.get(target));
                     if (!whitelists.contains(args[2].toLowerCase())) {
-                        sender.sendMessage("§e§lLUCKYCORE §a/ §c" + target.getName() + " §cis not bypassing" + args[2].toLowerCase() + "§c!");
+                        sender.sendMessage("§e§lBUILDMODE §a/ §c§l" + target.getName() + " §cis not bypassing §l" + args[2].toLowerCase() + "§c!");
                         return;
                     }
                     whitelists.remove(args[2].toLowerCase());
 
                     whitelistedMap.put(target, whitelists);
-                    sender.sendMessage("§e§lLUCKYCORE §a/ §6" + target.getName() + " §dis §cno longer bypassing §6" + args[2].toLowerCase() + "§d!");
+                    sender.sendMessage("§e§lBUILDMODE §a/ §d" + target.getName() + " §eis no longer bypassing §6" + args[2].toLowerCase() + "§e.");
                 } else {
                     if (plugin.getBuildModeList().contains(target)) {
-                        sender.sendMessage("§e§lLUCKYCORE §a/ §aTarget using build mode!");
+                        sender.sendMessage("§e§lBUILDMODE §a/ §cTarget is already using build mode!");
                     } else {
-                        sender.sendMessage("§e§lLUCKYCORE §a/ §cTarget is not bypassing anything!");
+                        sender.sendMessage("§e§lBUILDMODE §a/ §cTarget is not bypassing anything!");
                     }
                 }
             } else {
                 sender.sendMessage("§cUsage: /buildmode");
                 sender.sendMessage("§cUsage: /buildmode reload");
+                sender.sendMessage("§cUsage: /buildmode listEvents");
                 sender.sendMessage("§cUsage: /buildmode check <player>");
                 sender.sendMessage("§cUsage: /buildmode whitelist <player> <event>");
                 sender.sendMessage("§cUsage: /buildmode unwhitelist <player> <event>");
@@ -200,6 +204,8 @@ public class BuildModeCommand extends Command {
         } else {
             sender.sendMessage("§cUsage: /buildmode");
             sender.sendMessage("§cUsage: /buildmode reload");
+            sender.sendMessage("§cUsage: /buildmode listEvents");
+            sender.sendMessage("§cUsage: /buildmode check <player>");
             sender.sendMessage("§cUsage: /buildmode whitelist <player> <event>");
             sender.sendMessage("§cUsage: /buildmode unwhitelist <player> <event>");
             sender.sendMessage("§cUsage: /buildmode unwhitelist <player>");

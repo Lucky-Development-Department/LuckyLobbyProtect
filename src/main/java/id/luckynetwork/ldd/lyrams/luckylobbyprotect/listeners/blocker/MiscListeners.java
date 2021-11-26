@@ -14,7 +14,11 @@ public class MiscListeners implements Listener {
 
     @EventHandler
     public void onWeatherChange(WeatherChangeEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabled(event.getEventName())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getWorld())) {
             return;
         }
 
@@ -23,7 +27,11 @@ public class MiscListeners implements Listener {
 
     @EventHandler
     public void onPortalCreate(PortalCreateEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabled(event.getEventName())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getWorld())) {
             return;
         }
 

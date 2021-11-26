@@ -3,10 +3,7 @@ package id.luckynetwork.ldd.lyrams.luckylobbyprotect;
 import id.luckynetwork.ldd.lyrams.luckylobbyprotect.api.PlaceholderHooks;
 import id.luckynetwork.ldd.lyrams.luckylobbyprotect.api.impl.PlaceholderAPIExpansion;
 import id.luckynetwork.ldd.lyrams.luckylobbyprotect.command.BuildModeCommand;
-import id.luckynetwork.ldd.lyrams.luckylobbyprotect.listeners.blocker.BlockListeners;
-import id.luckynetwork.ldd.lyrams.luckylobbyprotect.listeners.blocker.EntityListeners;
-import id.luckynetwork.ldd.lyrams.luckylobbyprotect.listeners.blocker.MiscListeners;
-import id.luckynetwork.ldd.lyrams.luckylobbyprotect.listeners.blocker.PlayerListeners;
+import id.luckynetwork.ldd.lyrams.luckylobbyprotect.listeners.blocker.*;
 import id.luckynetwork.ldd.lyrams.luckylobbyprotect.managers.ListenerManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -39,9 +36,11 @@ public class LuckyLobbyProtect extends JavaPlugin {
 
         new BuildModeCommand(this);
         pluginManager.registerEvents(new BlockListeners(this), this);
+        pluginManager.registerEvents(new CommandListeners(this), this);
         pluginManager.registerEvents(new EntityListeners(this), this);
         pluginManager.registerEvents(new MiscListeners(this), this);
         pluginManager.registerEvents(new PlayerListeners(this), this);
+        pluginManager.registerEvents(new VehicleListeners(this), this);
     }
 
     @Override

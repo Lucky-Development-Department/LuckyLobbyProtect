@@ -16,12 +16,17 @@ public class BlockListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlace(BlockPlaceEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        String eventName = event.getEventName();
+        if (plugin.getListenerManager().isDisabled(eventName)) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getBlock().getWorld())) {
             return;
         }
 
         Player player = event.getPlayer();
-        if (plugin.getListenerManager().isWhitelisted(player, event)) {
+        if (plugin.getListenerManager().isWhitelisted(player, eventName)) {
             return;
         }
 
@@ -32,12 +37,17 @@ public class BlockListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBreak(BlockBreakEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        String eventName = event.getEventName();
+        if (plugin.getListenerManager().isDisabled(eventName)) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getBlock().getWorld())) {
             return;
         }
 
         Player player = event.getPlayer();
-        if (plugin.getListenerManager().isWhitelisted(player, event)) {
+        if (plugin.getListenerManager().isWhitelisted(player, eventName)) {
             return;
         }
 
@@ -48,7 +58,11 @@ public class BlockListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onLeafDecay(LeavesDecayEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabled(event.getEventName())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getBlock().getWorld())) {
             return;
         }
 
@@ -57,7 +71,11 @@ public class BlockListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabled(event.getEventName())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getBlock().getWorld())) {
             return;
         }
 
@@ -66,7 +84,11 @@ public class BlockListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockFade(BlockFadeEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabled(event.getEventName())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getBlock().getWorld())) {
             return;
         }
 
@@ -75,7 +97,11 @@ public class BlockListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockForm(BlockFormEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabled(event.getEventName())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getBlock().getWorld())) {
             return;
         }
 
@@ -84,7 +110,11 @@ public class BlockListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onExplosion(ExplosionPrimeEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabled(event.getEventName())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getEntity().getWorld())) {
             return;
         }
 

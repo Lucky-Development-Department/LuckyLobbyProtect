@@ -1,1 +1,8 @@
-disabled-listeners: []
+disabled-listeners:
+  - PlayerInteractEntityEvent
+  - PlayerInteractEvent-Right-Air
+  - PlayerInteractEvent-Left-Air
+  - PlayerInteractEvent-Physical
+  - EntityDamageByEntityEvent-Entity_Attack
+enabled-worlds:
+  - all

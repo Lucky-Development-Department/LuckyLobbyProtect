@@ -6,10 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityCreatePortalEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.*;
 
 @RequiredArgsConstructor
 public class EntityListeners implements Listener {
@@ -18,49 +15,110 @@ public class EntityListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
+        String eventName = event.getEventName() + "-" + event.getCause().name();
+        if (plugin.getListenerManager().isDisabled(eventName)) {
             return;
         }
 
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabledInWorld(event.getEntity().getWorld())) {
             return;
         }
 
-        Player player = (Player) event.getEntity();
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (plugin.getListenerManager().isWhitelisted(player, eventName)) {
+                return;
+            }
 
-        if (plugin.getListenerManager().isWhitelisted(player, event)) {
+            if (!plugin.getBuildModeList().contains(player)) {
+                event.setCancelled(true);
+            }
+        } else {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onDamageBlocks(EntityDamageByBlockEvent event) {
+        String eventName = event.getEventName();
+        if (plugin.getListenerManager().isDisabled(eventName)) {
             return;
         }
 
-        if (!plugin.getBuildModeList().contains(player)) {
+        if (plugin.getListenerManager().isDisabledInWorld(event.getEntity().getWorld())) {
+            return;
+        }
+
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (plugin.getListenerManager().isWhitelisted(player, eventName)) {
+                return;
+            }
+
+            if (!plugin.getBuildModeList().contains(player)) {
+                event.setCancelled(true);
+            }
+        } else {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onDamageOthers(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player)) {
+        String eventName = event.getEventName();
+        if (plugin.getListenerManager().isDisabled(eventName)) {
             return;
         }
 
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabledInWorld(event.getEntity().getWorld())) {
             return;
         }
 
-        Player damager = (Player) event.getDamager();
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (plugin.getListenerManager().isWhitelisted(player, eventName)) {
+                return;
+            }
 
-        if (plugin.getListenerManager().isWhitelisted(damager, event)) {
-            return;
-        }
+            if (event.getDamager() instanceof Player) {
+                Player damager = (Player) event.getDamager();
+                if (plugin.getListenerManager().isWhitelisted(damager, eventName)) {
+                    event.setCancelled(false);
+                    return;
+                }
 
-        if (!plugin.getBuildModeList().contains(damager)) {
+                if (plugin.getBuildModeList().contains(damager)) {
+                    event.setCancelled(false);
+                    return;
+                }
+
+                event.setCancelled(true);
+                return;
+            }
+
+            if (!plugin.getBuildModeList().contains(player)) {
+                event.setCancelled(true);
+            }
+        } else {
+            if (event.getDamager() instanceof Player) {
+                Player damager = (Player) event.getDamager();
+                if (plugin.getListenerManager().isWhitelisted(damager, eventName)) {
+                    event.setCancelled(false);
+                    return;
+                }
+            }
+
             event.setCancelled(true);
         }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPortalCreate(EntityCreatePortalEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        if (plugin.getListenerManager().isDisabled(event.getEventName())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isDisabledInWorld(event.getEntity().getWorld())) {
             return;
         }
 
@@ -69,11 +127,16 @@ public class EntityListeners implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onFoodChange(FoodLevelChangeEvent event) {
-        if (plugin.getListenerManager().isDisabled(event)) {
+        String eventName = event.getEventName();
+        if (plugin.getListenerManager().isDisabled(eventName)) {
             return;
         }
 
-        if (plugin.getListenerManager().isWhitelisted((Player) event.getEntity(), event)) {
+        if (plugin.getListenerManager().isDisabledInWorld(event.getEntity().getWorld())) {
+            return;
+        }
+
+        if (plugin.getListenerManager().isWhitelisted((Player) event.getEntity(), eventName)) {
             return;
         }
 
