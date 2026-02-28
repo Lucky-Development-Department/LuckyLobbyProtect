@@ -5,6 +5,8 @@ import id.luckynetwork.ldd.lyrams.luckylobbyprotect.api.impl.PlaceholderAPIExpan
 import id.luckynetwork.ldd.lyrams.luckylobbyprotect.command.BuildModeCommand;
 import id.luckynetwork.ldd.lyrams.luckylobbyprotect.listeners.blocker.*;
 import id.luckynetwork.ldd.lyrams.luckylobbyprotect.managers.ListenerManager;
+import id.luckynetwork.ldd.lyrams.luckylobbyprotect.managers.LoggingManager;
+import id.luckynetwork.ldd.lyrams.luckylobbyprotect.managers.NeoListenerManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,14 +16,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class LuckyLobbyProtect extends JavaPlugin {
 
-    @Getter
     private final List<Player> buildModeList = new ArrayList<>();
-    @Getter
     private PlaceholderHooks placeholderHooks;
-    @Getter
     private ListenerManager listenerManager;
+
+    private NeoListenerManager neoListenerManager;
+    private LoggingManager loggingManager;
 
     @Override
     public void onEnable() {
